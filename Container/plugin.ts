@@ -1,10 +1,7 @@
 import Vue_, { ComponentOptions } from 'vue';
 import {Container} from "./index";
 import Subject from "./helpers/Subject";
-
-interface IConstructor<T> {
-  new(...args: any[]): T;
-}
+import {IConstructor} from "./constructor";
 
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue_> {
@@ -21,19 +18,6 @@ declare module 'vue' {
 export default {
   install(Vue: typeof Vue_): void {
     Vue.mixin({
-      data() {
-        const di = this.$options.di;
-
-        if (!di) return {}
-
-        const data = {} as any
-        Object.entries(di)
-          .forEach(([name, object]) => {
-            data[name] = Container.get(object)
-          })
-
-        return data;
-      },
       beforeCreate() {
         const di = this.$options.di;
 

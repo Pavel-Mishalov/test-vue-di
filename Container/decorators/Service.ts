@@ -20,7 +20,13 @@ function DeepProxy<T extends object>(target: T, handler: ProxyHandler<T>): T {
   }
 }
 
-export const Service: () => ClassDecorator = () => (target) => {
+export type ServiceRegisterType = 'singleton' | 'multiple' | 'keys'
+type ServiceRegisterOptions = {
+  type: ServiceRegisterType
+}
+type ServiceFn = (options?: ServiceRegisterOptions) => ClassDecorator
+
+export const Service: ServiceFn = (options= {type: 'singleton'}) => (target) => {
   Container.set(target as any, () => {
     // @ts-ignore
     const obj = new target()
@@ -61,7 +67,7 @@ export const Service: () => ClassDecorator = () => (target) => {
     })
 
     return proxy
-  })
+  }, options.type)
 
   return target
 }

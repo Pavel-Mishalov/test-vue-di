@@ -1,19 +1,7 @@
-import { Container } from "./index";
 import Subject from "./helpers/Subject";
 export default {
     install(Vue) {
         Vue.mixin({
-            data() {
-                const di = this.$options.di;
-                if (!di)
-                    return {};
-                const data = {};
-                Object.entries(di)
-                    .forEach(([name, object]) => {
-                    data[name] = Container.get(object);
-                });
-                return data;
-            },
             beforeCreate() {
                 const di = this.$options.di;
                 if (!di)

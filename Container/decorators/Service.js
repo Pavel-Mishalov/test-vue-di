@@ -18,7 +18,7 @@ function DeepProxy(target, handler) {
         return target;
     }
 }
-export const Service = () => (target) => {
+export const Service = (options = { type: 'singleton' }) => (target) => {
     Container.set(target, () => {
         // @ts-ignore
         const obj = new target();
@@ -53,7 +53,7 @@ export const Service = () => (target) => {
             }
         });
         return proxy;
-    });
+    }, options.type);
     return target;
 };
 //# sourceMappingURL=Service.js.map

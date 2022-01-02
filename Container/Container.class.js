@@ -1,27 +1,75 @@
 class Container {
     constructor() {
-        this.__initializeList = new Map();
-        this.__cache = new Map();
+        this.__initializeList = {
+            singleton: new Map(),
+            keys: new Map(),
+            multiple: new Map()
+        };
+        this.__cache = {
+            singleton: new Map(),
+            keys: {}
+        };
     }
-    set(constructor, fn) {
-        if (this.__initializeList.has(constructor)) {
+    set(constructor, fn, type) {
+        if (this.__initializeList[type].has(constructor)) {
             console.warn('@di: Error, register class second times');
         }
-        this.__initializeList.set(constructor, fn);
+        this.__initializeList[type].set(constructor, fn);
     }
-    register(constructor) {
-        if (!this.__initializeList.has(constructor)) {
-            console.warn('@di: Error, get unregister class');
+    register(constructor, key) {
+        const isKeyNeed = !!key && key === 'keys';
+        if (isKeyNeed) {
+            this.registerToKeys(constructor, key);
         }
-        if (this.__initializeList.has(constructor)) {
-            this.__cache.set(constructor, this.__initializeList.get(constructor)());
+        else {
+            this.registerToSingleton(constructor);
         }
     }
-    get(resource) {
-        if (!this.__cache.has(resource)) {
+    get(resource, key) {
+        const isKeyNeed = !!key && key === 'keys';
+        if (isKeyNeed) {
+            return this.getByKey(resource, key);
+        }
+        return this.getSingletonClass(resource);
+    }
+    getByKey(resource, key) {
+        const isKeyNeed = !!key && key === 'keys';
+        const cache = isKeyNeed ? this.__cache.keys : this.__cache.singleton;
+        if (!(key in this.__cache.keys) || !this.__cache.keys[key].has(resource)) {
+            this.register(resource, key);
+        }
+        return this.__cache.keys[key].get(resource);
+    }
+    getSingletonClass(resource) {
+        if (!this.__cache.singleton.has(resource)) {
             this.register(resource);
         }
-        return this.__cache.get(resource);
+        return this.__cache.singleton.get(resource);
+    }
+    registerToKeys(constructor, key) {
+        if (!this.__initializeList.keys.has(constructor)) {
+            console.warn('@di [Container.registerToKeys]: Error, get unregister class');
+        }
+        if (this.__initializeList.keys.has(constructor)) {
+            if (!(key in this.__cache.keys)) {
+                this.__cache.keys[key] = new Map();
+            }
+            this.__cache.keys[key].set(constructor, this.__initializeList.keys.get(constructor)());
+        }
+    }
+    registerToSingleton(constructor) {
+        if (!this.__initializeList.singleton.has(constructor)) {
+            console.warn('@di [Container.registerToSingleton]: Error, get unregister class');
+        }
+        if (this.__initializeList.singleton.has(constructor)) {
+            this.__cache.singleton.set(constructor, this.__initializeList.singleton.get(constructor)());
+        }
+    }
+    toJSON() {
+        return {
+            ...this,
+            diClassInstance: 'Container'
+        };
     }
 }
 export default new Container();

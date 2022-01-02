@@ -1,6 +1,4 @@
-interface IConstructor<T> {
-  new(...args: any[]): T;
-}
+import {IConstructor} from "../constructor";
 
 class Subject {
   private subscription: Array<(name: IConstructor<unknown>) => void> = []

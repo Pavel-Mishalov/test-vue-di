@@ -1,5 +1,4 @@
-import {Service} from "~/Container/decorators/Service";
-import {getter} from "~/Container/decorators/getter";
+import {Service, getter, inject, env} from "~/Container";
 
 @Service()
 class Test {
@@ -12,4 +11,30 @@ class Test {
   }
 }
 
-export default Test
+@Service()
+class TestOther {
+  @env('NODE_ENV')
+  production
+  name = 'Pavel'
+  age = 12
+
+  /**
+   * @type Test
+   */
+  @inject(Test)
+  testFirst
+
+  @getter(['age'])
+  get user() {
+    return `${this.age}, ${this.name}`
+  }
+
+  getDeepName() {
+    return this.testFirst.user
+  }
+}
+
+export {
+  Test,
+  TestOther
+}

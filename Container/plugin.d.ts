@@ -1,8 +1,6 @@
 import Vue_ from 'vue';
 import { Container } from "./index";
-interface IConstructor<T> {
-    new (...args: any[]): T;
-}
+import { IConstructor } from "./constructor";
 declare module 'vue/types/options' {
     interface ComponentOptions<V extends Vue_> {
         di?: Record<string, IConstructor<any>>;

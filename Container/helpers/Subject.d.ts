@@ -1,6 +1,4 @@
-interface IConstructor<T> {
-    new (...args: any[]): T;
-}
+import { IConstructor } from "../constructor";
 declare class Subject {
     private subscription;
     subscribe(callback: (name: IConstructor<unknown>) => void): () => void;
